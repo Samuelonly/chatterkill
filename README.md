@@ -1,5 +1,9 @@
 # Chatterkill · 抖抑
 
+<p align="center">
+  <img src="docs/icon.png" width="256" alt="Chatterkill icon">
+</p>
+
 ![Chatterkill 108 键检测面板](docs/panel.png)
 
 **中文介绍**
