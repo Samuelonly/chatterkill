@@ -8,11 +8,11 @@
 
 **中文介绍**
 
-Chatterkill（中文名「抖抑」）是一个 macOS 菜单栏小工具，专门治键盘的两类坏毛病：一类键太灵，轻点一下就冒出两三个字符——`apple` 打成 `apppple`；另一类键太肉，不使劲按就不出字。它一边在系统层把这些多余的重复按键吞掉，一边给出一张 108 键的检测面板，让你一眼看出到底是哪几个键在犯病，并且可以只给那几个键单独设一个更宽的延迟，不牵连其他键。
+Chatterkill（中文名「抖抑」）是一个 macOS 菜单栏小工具，专门治键盘的两类坏毛病：一类键太灵，轻点一下就冒出两三个字符——`apple` 打成 `apppple`，也就是俗称的**键盘连击 / 按键双击 / 抖动**；另一类键太肉，不使劲按就不出字。它一边在系统层把这些多余的重复按键吞掉，一边给出一张 108 键的检测面板，让你一眼看出到底是哪几个键在犯病，并且可以只给那几个键单独设一个更宽的延迟，不牵连其他键。
 
 **English**
 
-Chatterkill is a tiny macOS menu-bar utility that fixes two kinds of keyboard faults: keys that are too sensitive, where a light tap fires two or three characters (`apple` → `apppple`), and keys that are too mushy, where nothing shows up unless you press hard. It swallows those extra presses at the system event level, and gives you a 108-key tester so you can see at a glance which keys are misbehaving — then set a wider delay for just those keys, without slowing down the rest.
+Chatterkill is a tiny macOS menu-bar utility that stops **keyboard double typing** (key chatter): keys that are too sensitive, where a light tap fires two or three characters (`apple` → `apppple`), and keys that are too mushy, where nothing shows up unless you press hard. It swallows those extra presses at the system event level — a **keyboard chatter / debounce blocker for macOS** — and gives you a 108-key tester so you can see at a glance which keys are misbehaving, then set a wider delay for just those keys, without slowing down the rest.
 
 ## 为什么做这个 / Why
 
