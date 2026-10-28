@@ -21,23 +21,23 @@ struct AppConfig: Codable, Equatable {
         var showAnomalyDot: Bool = false
     }
 
-    /// 打字统计：今日 / 累计字数。
+    /// 拦截统计：今日 / 累计拦截次数。
     struct Stats: Codable, Equatable {
         var day: String = ""
-        var today: Int = 0
-        var total: Int = 0
+        var blockedToday: Int = 0
+        var blockedTotal: Int = 0
 
-        init(day: String = "", today: Int = 0, total: Int = 0) {
+        init(day: String = "", blockedToday: Int = 0, blockedTotal: Int = 0) {
             self.day = day
-            self.today = today
-            self.total = total
+            self.blockedToday = blockedToday
+            self.blockedTotal = blockedTotal
         }
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             day = (try container.decodeIfPresent(String.self, forKey: .day)) ?? ""
-            today = (try container.decodeIfPresent(Int.self, forKey: .today)) ?? 0
-            total = (try container.decodeIfPresent(Int.self, forKey: .total)) ?? 0
+            blockedToday = (try container.decodeIfPresent(Int.self, forKey: .blockedToday)) ?? 0
+            blockedTotal = (try container.decodeIfPresent(Int.self, forKey: .blockedTotal)) ?? 0
         }
     }
 

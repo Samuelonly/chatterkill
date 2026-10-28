@@ -12,6 +12,7 @@ STAGE="$ROOT/dist/dmg-stage"
 rm -rf "$STAGE" "$DMG"
 mkdir -p "$STAGE"
 cp -R "$APP" "$STAGE/"
+cp "$ROOT/Resources/READ ME（先读我）.txt" "$STAGE/"
 ln -s /Applications "$STAGE/Applications"
 
 hdiutil create -volname "Chatterkill" -srcfolder "$STAGE" -ov -format UDZO "$DMG"

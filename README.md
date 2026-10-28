@@ -72,6 +72,8 @@ My mechanical keyboard is a few years old and some keys started misbehaving: a f
 
 2. 首次打开请**右键 → 打开**（没有公证签名，双击会被 Gatekeeper 挡住）。| First launch: **right-click → Open** (the build isn't notarized, so double-click is blocked by Gatekeeper).
 
+   看到「Apple 无法检查其是否包含恶意软件」别慌——对于没有付费证书的免费应用来说，这些提示都是正常的。Chatterkill 的全部代码都[在 GitHub 上开源](https://github.com/Samuelonly/chatterkill)，运行前你可以先读代码。| Seeing "Apple cannot check it for malicious software"? Those prompts are normal for free apps without a paid certificate. Everything Chatterkill does is [open on GitHub](https://github.com/Samuelonly/chatterkill), so you can read the code before running it.
+
 3. 或者在终端里去掉隔离标记：| Or clear the quarantine flag:
 
    ```bash
@@ -93,7 +95,7 @@ There's no Dock icon; it lives in the menu bar only. Double-clicking the app ico
 3. 红键 = 连击，蓝键 = 迟钝，绿键 = 正常。| Red = chattering, blue = mushy, green = fine.
 4. 点任意键帽 → 选 50–300 ms 的阈值；**Use global** 取消这个键的单独设置。| Click any key cap → pick a 50–300 ms threshold; **Use global** removes the per-key override.
 5. 点 **DONE** 或关窗：面板销毁，只留引擎。| Click **DONE** or close the window: panel destroyed, engine stays.
-6. 菜单栏里还能看到**今日字数 / 累计字数**两栏打字统计（跨天自动清零今日）。| The menu also shows **chars today / chars total** (today resets at midnight).
+6. 菜单栏里还能看到**今日拦截 / 累计拦截**两栏统计（今日每天零点自动清零）。| The menu also shows **blocked today / blocked total** (today resets at midnight).
 
 配置文件：`~/Library/Application Support/Chatterkill/config.json` | Config lives at the same path.
 
@@ -119,7 +121,7 @@ The event engine and menu-bar shell are forked from [Eviduunce/Debounce](https:/
 ```
 Sources/Chatterkill/
   App/        main.swift, AppDelegate.swift, PanelController.swift
-  Engine/     ChatterBlocker.swift, EventInterceptor.swift, KeyMap.swift, TypingCounter.swift
+  Engine/     ChatterBlocker.swift, EventInterceptor.swift, KeyMap.swift, BlockCounter.swift
   Support/    ConfigStore.swift, PermissionHelper.swift, Loc.swift
 Resources/
   web/        index.html, app.js      (tester panel, zero network calls)

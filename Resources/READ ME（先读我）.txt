@@ -1,0 +1,31 @@
+先读我 / READ ME
+================
+
+中文
+----
+1. 把 Chatterkill 拖进右边的 Applications 文件夹。
+2. 第一次打开：在「应用程序」里【右键 Chatterkill → 打开】。
+   弹窗里这次会有「打开」按钮，点它。
+   （直接双击会被 Gatekeeper 拦住，看不到打开按钮。）
+3. 系统会请求「辅助功能」权限：系统设置 → 隐私与安全性 → 辅助功能 → 勾上 Chatterkill。
+4. 完成。它住在菜单栏，没有 Dock 图标；双击图标可重新打开检测面板。
+
+如果你先双击了、看到「Apple 无法检查其是否包含恶意软件」：
+别慌，软件没坏也不用更新。对于没有付费证书的免费应用来说，这些提示都是正常的。
+Chatterkill 的全部代码都在 GitHub 上开源，运行前你可以先读代码：
+https://github.com/Samuelonly/chatterkill
+
+English
+-------
+1. Drag Chatterkill into the Applications folder on the right.
+2. First launch: right-click Chatterkill in Applications and choose Open.
+   This time the dialog has an Open button — click it.
+   (Double-clicking is blocked by Gatekeeper and shows no Open button.)
+3. Grant Accessibility when asked: System Settings → Privacy & Security → Accessibility → enable Chatterkill.
+4. Done. It lives in the menu bar (no Dock icon); double-clicking the app icon reopens the tester panel.
+
+Double-clicked first and got "Apple cannot check it for malicious software"?
+Nothing is wrong with the app and there is nothing to update.
+Those prompts are normal for free apps without a paid certificate.
+Everything Chatterkill does is open on GitHub, so you can read the code before running it:
+https://github.com/Samuelonly/chatterkill

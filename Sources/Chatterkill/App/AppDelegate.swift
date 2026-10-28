@@ -15,7 +15,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     let blocker = ChatterBlocker()
     let store = ConfigStore()
-    private let typing = TypingCounter()
+    private let counter = BlockCounter()
     private let permissionHelper = PermissionHelper()
     private var interceptor: EventInterceptor?
 
@@ -45,7 +45,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         store.blockerProvider = { [weak self] in self?.blocker }
         store.apply(to: blocker)
-        typing.load(from: store.config.stats)
+        counter.load(from: store.config.stats)
 
         setupMenuBar()
 
@@ -56,9 +56,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         // 面板只在活着时收事件；关掉后 send() 直接 return，零开销（R1）。
         blocker.onKeyEvent = { [weak self] event in
             guard let self else { return }
-            // 每次按下顺手记一个字；被吞掉的连击不算（没出字）。
-            if event.phase == .down, !event.blocked, self.typing.count(event.name) {
-                self.store.config.stats = self.typing.snapshot
+            // 每吞掉一次连击顺手记一次；跨天或攒够 100 次才写盘。
+            if event.blocked, self.counter.count() {
+                self.store.config.stats = self.counter.snapshot
                 self.store.write()
             }
             self.panel.send(event)
@@ -110,7 +110,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         interceptor?.stop()
         blocker.resetTimingData()
         store.capture(from: blocker)
-        store.config.stats = typing.snapshot
+        store.config.stats = counter.snapshot
         store.write()
     }
 
@@ -202,14 +202,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         menu.addItem(.separator())
 
-        // 打字统计两栏：今日 / 累计。打开菜单时刷新，不做定时器。
-        let today = NSMenuItem(title: "", action: nil, keyEquivalent: "")
-        today.isEnabled = false
+        // 拦截统计两栏：今日 / 累计。打开菜单时刷新，不做定时器。
+        let today = NSMenuItem(title: "", action: #selector(noop), keyEquivalent: "")
+        today.target = self
         todayMenuItem = today
         menu.addItem(today)
 
-        let total = NSMenuItem(title: "", action: nil, keyEquivalent: "")
-        total.isEnabled = false
+        let total = NSMenuItem(title: "", action: #selector(noop), keyEquivalent: "")
+        total.target = self
         totalMenuItem = total
         menu.addItem(total)
 
@@ -292,7 +292,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         launchAtLoginMenuItem?.state = launchAtLoginEnabled ? .on : .off
 
-        updateTypingMenuItems()
+        updateBlockMenuItems()
 
         if let button = statusItem?.button {
             button.image = NSImage(
@@ -310,20 +310,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     // MARK: - Menu delegate
 
     func menuWillOpen(_ menu: NSMenu) {
-        updateTypingMenuItems()
+        updateBlockMenuItems()
     }
 
-    private func updateTypingMenuItems() {
-        todayMenuItem?.attributedTitle = typingMenuTitle(
-            Loc.t("Today", "今日字数"), value: typing.today
+    private func updateBlockMenuItems() {
+        todayMenuItem?.attributedTitle = blockMenuTitle(
+            Loc.t("Blocked today", "今日拦截"), value: counter.today
         )
-        totalMenuItem?.attributedTitle = typingMenuTitle(
-            Loc.t("Total", "累计字数"), value: typing.total
+        totalMenuItem?.attributedTitle = blockMenuTitle(
+            Loc.t("Blocked total", "累计拦截"), value: counter.total
         )
     }
 
-    /// 禁用态菜单项默认会被画成灰色；这里显式指定颜色，深色模式下也看得清。
-    private func typingMenuTitle(_ title: String, value: Int) -> NSAttributedString {
+    /// 禁用态菜单项会被 AppKit 强制画灰，attributedTitle 的颜色也会被压暗；
+    /// 所以这两栏用「启用 + 空操作」实现纯展示，深色模式下也是白色。
+    @objc private func noop() {}
+
+    private func blockMenuTitle(_ title: String, value: Int) -> NSAttributedString {
         let label = NSFont.menuFont(ofSize: 0)
         let numberFont = NSFont.monospacedDigitSystemFont(ofSize: label.pointSize, weight: .regular)
 
