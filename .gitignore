@@ -1,0 +1,7 @@
+.build/
+dist/
+.swiftpm/
+.DS_Store
+
+# 图标中间产物
+Resources/AppIcon.iconset/

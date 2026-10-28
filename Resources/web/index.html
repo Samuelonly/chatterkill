@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chatterkill</title>
+<style>
+  :root{
+    --u: 40px;
+    --h: 42px;
+    --fh: 30px;
+    --gap: 4px;
+    --bg: #1c1c1e;
+    --panel: #242426;
+    --key: #2c2c2e;
+    --key-top: #3a3a3c;
+    --txt: #e8e8ea;
+    --muted: #8e8e93;
+    --accent: #00d5d5;
+    --green: #30d158;
+    --red: #ff453a;
+    --blue: #0a84ff;
+    --cyan: #64d2ff;
+  }
+  *{ box-sizing: border-box; -webkit-user-select: none; user-select: none; }
+  html,body{ height:100%; margin:0; }
+  body{
+    background: var(--bg);
+    color: var(--txt);
+    font: 13px/1.4 -apple-system, "SF Pro Text", "Helvetica Neue", "PingFang SC", sans-serif;
+    display: flex; flex-direction: column;
+    padding: 14px 16px 10px;
+    gap: 10px;
+    overflow: hidden;
+  }
+
+  /* ---------- header ---------- */
+  header{ display:flex; align-items:center; gap:12px; flex:0 0 auto; }
+  .brand{ font-size:15px; font-weight:700; letter-spacing:.14em; color:#fff; }
+  .brand span{ color: var(--accent); }
+  .sub{ color: var(--muted); font-size:11px; letter-spacing:.06em; }
+  header .spacer{ flex:1; }
+  .pill{
+    display:flex; align-items:center; gap:6px;
+    border:1px solid #3a3a3c; border-radius:999px;
+    padding:4px 10px; color:var(--muted); font-size:11px;
+  }
+  .dot{ width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 6px var(--green); }
+  .dot.warn{ background:#ffd60a; box-shadow:0 0 6px #ffd60a; }
+  .pill.fix{ cursor:pointer; color:#ffd60a; border-color:#5a4d18; }
+  .pill.fix:hover{ border-color:#ffd60a; }
+
+  /* ---------- stage ---------- */
+  .stage{ display:flex; gap:12px; flex:1 1 auto; min-height:0; align-items:flex-start; }
+  .board{ display:flex; gap:10px; padding:10px; background:var(--panel); border-radius:10px; border:1px solid #303032; }
+  .col{ display:flex; flex-direction:column; gap:var(--gap); }
+  .row{ display:flex; gap:var(--gap); height:var(--h); }
+  .row.fn{ height:var(--fh); }
+
+  .key{
+    position:relative;
+    background: linear-gradient(180deg, var(--key-top), var(--key));
+    border:1px solid #454547;
+    border-radius:6px;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--txt); font-size:11px; font-weight:500;
+    cursor:pointer;
+    transition: background .08s linear, transform .06s linear, border-color .15s, box-shadow .15s;
+    padding:0 4px; white-space:nowrap; overflow:hidden;
+  }
+  .key.small{ font-size:9.5px; }
+  .key.pressed{ background:#4a4a4c; transform: translateY(2px); }
+  .key.spacer{ background:transparent; border:none; pointer-events:none; }
+  .key.locked{ opacity:.32; cursor:not-allowed; }
+
+  /* five states */
+  .key[data-state="untested"]{ box-shadow: inset 0 0 0 1px rgba(100,210,255,.22); }
+  .key[data-state="normal"]{ border-color: rgba(48,209,88,.65); box-shadow: 0 0 0 1px rgba(48,209,88,.28), inset 0 0 8px rgba(48,209,88,.12); }
+  .key[data-state="chatter"]{ border-color: var(--red); box-shadow: 0 0 0 1px var(--red), 0 0 12px rgba(255,69,58,.55), inset 0 0 10px rgba(255,69,58,.22); }
+  .key[data-state="slow"]{ border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue), 0 0 10px rgba(10,132,255,.4); }
+  .key[data-badge="on"]::after{
+    content:''; position:absolute; top:3px; right:3px;
+    width:4px; height:4px; border-radius:50%; background: var(--green);
+  }
+  .key[data-state="chatter"][data-badge="on"]::after{ background: var(--red); }
+  .key[data-state="slow"][data-badge="on"]::after{ background: var(--blue); }
+  .key .ms{
+    position:absolute; bottom:1px; left:0; right:0;
+    font-size:8px; text-align:center; color:var(--muted); line-height:1;
+  }
+
+  /* ---------- side ---------- */
+  .side{
+    width:150px; flex:0 0 auto; padding:12px; background:var(--panel);
+    border-radius:10px; border:1px solid #303032; display:flex; flex-direction:column; gap:8px;
+  }
+  .side .label{ color:var(--muted); font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+  .side .big{ font-size:18px; font-weight:600; color:#fff; word-break:break-all; }
+  .side .time{ font-variant-numeric: tabular-nums; color:var(--accent); font-size:12px; }
+  .side .kv{ display:flex; justify-content:space-between; font-size:11px; color:var(--muted); }
+  .side .kv b{ color:var(--txt); font-weight:500; font-variant-numeric: tabular-nums; }
+
+  /* ---------- bottom ---------- */
+  .foot{ display:flex; gap:10px; flex:0 0 auto; align-items:stretch; }
+  .stats{ flex:1; display:flex; gap:0; background:var(--panel); border:1px solid #303032; border-radius:10px; overflow:hidden; }
+  .stat{ flex:1; padding:8px 12px; border-right:1px solid #303032; }
+  .stat:last-child{ border-right:none; }
+  .stat .label{ color:var(--muted); font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+  .stat .value{ font-size:20px; font-weight:300; color:#fff; font-variant-numeric: tabular-nums; }
+  button{
+    font: inherit; color:#fff; background:#3a3a3c; border:1px solid #48484a;
+    border-radius:10px; padding:0 18px; cursor:pointer; transition:background .12s;
+  }
+  button:hover{ background:#48484a; }
+  button.primary{ background:#0a6e6e; border-color:#0f8a8a; letter-spacing:.1em; font-weight:600; }
+  button.primary:hover{ background:#0c8080; }
+
+  .legend{ display:flex; gap:16px; color:var(--muted); font-size:10.5px; flex:0 0 auto; flex-wrap:wrap; }
+  .legend i{ display:inline-block; width:8px; height:8px; border-radius:2px; margin-right:5px; vertical-align:middle; }
+
+  /* ---------- threshold popover ---------- */
+  .pop{
+    position:fixed; z-index:20; display:none;
+    background:#2f2f31; border:1px solid #4a4a4c; border-radius:10px;
+    padding:12px; width:220px; box-shadow:0 12px 30px rgba(0,0,0,.5);
+  }
+  .pop.on{ display:block; }
+  .pop h5{ margin:0 0 4px; font-size:12px; font-weight:600; }
+  .pop .hint{ color:var(--muted); font-size:10px; margin-bottom:10px; }
+  .pop .val{ font-size:22px; font-weight:300; font-variant-numeric: tabular-nums; margin-bottom:6px; }
+  .pop input[type=range]{ width:100%; margin:0; accent-color: var(--accent); }
+  .pop .acts{ display:flex; gap:6px; margin-top:10px; }
+  .pop .acts button{ flex:1; padding:5px 0; font-size:11px; border-radius:7px; }
+  .pop .reset-key{ background:transparent; border-color:#48484a; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">CHATTER<span>KILL</span></div>
+  <div class="sub" id="tagline">key chatter tester</div>
+  <div class="spacer"></div>
+  <div class="pill" id="enginePill"><span class="dot" id="engineDot"></span><span id="engineText">listening</span></div>
+</header>
+
+<div class="stage">
+  <div class="board" id="board"></div>
+  <div class="side">
+    <div class="label" id="lastLabel">last key</div>
+    <div class="big" id="lastKey">—</div>
+    <div class="time" id="lastTime">--:--:--.---</div>
+    <div style="height:1px;background:#303032;margin:4px 0"></div>
+    <div class="kv"><span id="thrLabel">threshold</span><b id="lastThr">—</b></div>
+    <div class="kv"><span id="intLabel">interval</span><b id="lastInt">—</b></div>
+    <div class="kv"><span id="cntLabel">presses</span><b id="lastCnt">0</b></div>
+  </div>
+</div>
+
+<div class="foot">
+  <div class="stats">
+    <div class="stat">
+      <div class="label" id="s1">measured keys</div>
+      <div class="value" id="v1">0</div>
+    </div>
+    <div class="stat">
+      <div class="label" id="s2">chatter hits</div>
+      <div class="value" id="v2">0</div>
+    </div>
+    <div class="stat">
+      <div class="label" id="s3">fastest interval</div>
+      <div class="value" id="v3">0</div>
+    </div>
+    <div class="stat">
+      <div class="label" id="s4">last single-key rate</div>
+      <div class="value" id="v4">0</div>
+    </div>
+  </div>
+  <button id="reset">RESET</button>
+  <button class="primary" id="done">DONE</button>
+</div>
+
+<div class="legend">
+  <span><i style="background:#5a5a5c"></i><span id="l0">untested</span></span>
+  <span><i style="background:var(--green)"></i><span id="l1">normal</span></span>
+  <span><i style="background:var(--red)"></i><span id="l2">too fast / chatter</span></span>
+  <span><i style="background:var(--blue)"></i><span id="l3">slow release</span></span>
+  <span><i style="background:#5a5a5c;opacity:.4"></i><span id="l4">not reported by firmware</span></span>
+</div>
+
+<div class="pop" id="pop">
+  <h5 id="popTitle">Threshold</h5>
+  <div class="hint" id="popHint">Shorter than this = same bounce, blocked.</div>
+  <div class="val"><span id="popVal">100</span> ms</div>
+  <input type="range" id="popRange" min="50" max="300" step="5" value="100">
+  <div class="acts">
+    <button class="reset-key" id="popGlobal">Use global</button>
+    <button id="popOk">OK</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
