@@ -12,6 +12,12 @@
 | D | 开机自启 / 中英自动适配 / 图标 | ✅ 代码与图标已完成，**待重启验收** |
 | E | 验收 + DMG | 🟡 DMG 脚本就绪，压测与重启验收未做 |
 
+## v0.3.0 更新 / Changelog
+
+- 密码框 / Secure Input 下自动降级为本地监听，面板内打字仍可检测 | Auto-fallback to local monitor during Secure Input; panel still works within Chatterkill's own windows
+- 菜单栏新增隐私提示：🔒 仅本地处理，不联网 | Menu bar privacy notice: 🔒 Local only, no network
+- 阈值滑块下限从 50ms 降至 30ms | Threshold slider minimum lowered from 50ms to 30ms
+
 ## 关键事实（别重复踩）
 
 - **这台机器没有 Xcode**，只有 CommandLineTools（Swift 6.4，SDK macOS 27）。

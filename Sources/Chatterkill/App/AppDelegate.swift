@@ -18,6 +18,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let counter = BlockCounter()
     private let permissionHelper = PermissionHelper()
     private var interceptor: EventInterceptor?
+    private var localMonitor: Any?
 
     // MARK: - UI
 
@@ -108,6 +109,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         interceptor?.stop()
+        stopFallbackMonitor()
         blocker.resetTimingData()
         store.capture(from: blocker)
         store.config.stats = counter.snapshot
@@ -135,6 +137,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private func startEngine(presentPermissionAlert: Bool) {
         guard let interceptor else { return }
+
+        stopFallbackMonitor()
 
         let trusted = permissionHelper.isAccessibilityTrusted(prompt: false)
         let result = interceptor.start()
@@ -171,12 +175,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func handleTapDied() {
         interceptor?.stop()
         engineRunning = false
-        presentAlert(
-            Loc.t("Chatter blocking stopped", "拦键已停止"),
-            Loc.t("The keyboard event monitor was terminated by the system. Turn Chatterkill off and on again from the menu bar.",
-                  "系统把键盘事件监听停掉了。请从菜单栏把 Chatterkill 关一次再开。")
-        )
+        startFallbackMonitor()
         refreshMenu()
+    }
+
+    /// 全局 tap 被系统停用（Secure Input）时，启动本地监听作为后备。
+    /// 仅在 Chatterkill 自身窗口内有效（如面板输入框），无法监听其他应用的密码框。
+    private func startFallbackMonitor() {
+        guard localMonitor == nil else { return }
+        localMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard let self else { return event }
+            _ = self.blocker.handleKeyDown(keyCode: CGKeyCode(event.keyCode))
+            return event
+        }
+    }
+
+    private func stopFallbackMonitor() {
+        if let monitor = localMonitor {
+            NSEvent.removeMonitor(monitor)
+            localMonitor = nil
+        }
     }
 
     // MARK: - Menu bar
@@ -199,6 +217,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         status.isEnabled = false
         statusMenuItem = status
         menu.addItem(status)
+
+        let privacy = NSMenuItem(title: Loc.t("🔒 Local only, no network", "🔒 仅本地处理，不联网"),
+                                 action: #selector(noop), keyEquivalent: "")
+        privacy.target = self
+        privacy.isEnabled = false
+        menu.addItem(privacy)
 
         menu.addItem(.separator())
 

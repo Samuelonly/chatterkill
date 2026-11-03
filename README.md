@@ -97,7 +97,7 @@ There's no Dock icon; it lives in the menu bar only. Double-clicking the app ico
 1. 菜单栏图标 → **打开检测面板…** | menu-bar icon → **Open Tester…**
 2. 打一段字，或者把怀疑的键各按几下。| Type a paragraph, or tap each suspect key a few times.
 3. 红键 = 连击，蓝键 = 迟钝，绿键 = 正常。| Red = chattering, blue = mushy, green = fine.
-4. 点任意键帽 → 选 50–300 ms 的阈值；**Use global** 取消这个键的单独设置。| Click any key cap → pick a 50–300 ms threshold; **Use global** removes the per-key override.
+4. 点任意键帽 → 选 30–300 ms 的阈值；**Use global** 取消这个键的单独设置。| Click any key cap → pick a 30–300 ms threshold; **Use global** removes the per-key override.
 5. 点 **DONE** 或关窗：面板销毁，只留引擎。| Click **DONE** or close the window: panel destroyed, engine stays.
 6. 菜单栏里还能看到**今日拦截 / 累计拦截**两栏统计（今日每天零点自动清零）。| The menu also shows **blocked today / blocked total** (today resets at midnight).
 
@@ -135,11 +135,26 @@ scripts/      build-app.sh, create-dmg.sh
 
 ## 已知限制 / Known limits
 
-- 密码框、`sudo`、Touch ID 这类安全输入，macOS 会主动禁用事件监听，拦不了，这是系统行为。| macOS disables event taps around secure input (password fields, `sudo`, Touch ID). Not a bug.
+- 密码框、`sudo`、Touch ID 这类安全输入，macOS 会主动禁用事件监听。此时 Chatterkill 自动切换到本地监听模式，面板内打字仍可检测，但无法拦截其他应用的密码输入——这是系统级安全限制。| macOS disables event taps around secure input (password fields, `sudo`, Touch ID). Chatterkill automatically falls back to local monitoring: the panel still works for typing within its own windows, but cannot intercept password input in other apps — this is a system-level security restriction.
 
 - α 版本只做“吞掉多余按键”，不会帮迟钝的键补发字符。| The alpha only swallows extra presses; it won't re-send characters for mushy keys.
 
 - 自己重新编译会改变签名，辅助功能里的旧授权会失效，需要删掉重新勾一次。| Rebuilding changes the signature, which invalidates the Accessibility grant — remove the stale entry and grant again.
+
+## 版本更新 / Changelog
+
+### v0.3.0
+
+- 密码框 / Secure Input 下自动降级为本地监听，面板内打字仍可检测 | Auto-fallback to local monitor during Secure Input; panel still works within Chatterkill's own windows
+- 菜单栏新增隐私提示：🔒 仅本地处理，不联网 | Menu bar privacy notice: 🔒 Local only, no network
+- 阈值滑块下限从 50ms 降至 30ms | Threshold slider minimum lowered from 50ms to 30ms
+
+### v0.2.0
+
+- 108 键检测面板 + WKWebView 桥接 | 108-key tester panel with WKWebView bridge
+- 五态可视化（未测 / 正常 / 连击 / 迟钝 / 固件不上报）| Five-state visualization (untested / normal / chatter / slow / locked)
+- 点键改阈值，JSON 配置落盘 | Click-to-set threshold, JSON config persistence
+- 开机自启 / 中英自动适配 | Launch at login / auto bilingual (zh/en)
 
 ## License
 
