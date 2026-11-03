@@ -145,16 +145,25 @@ scripts/      build-app.sh, create-dmg.sh
 
 ### v0.3.0
 
-- 密码框 / Secure Input 下自动降级为本地监听，面板内打字仍可检测 | Auto-fallback to local monitor during Secure Input; panel still works within Chatterkill's own windows
-- 菜单栏新增隐私提示：🔒 仅本地处理，不联网 | Menu bar privacy notice: 🔒 Local only, no network
-- 阈值滑块下限从 50ms 降至 30ms | Threshold slider minimum lowered from 50ms to 30ms
+- 密码框 / Secure Input 下自动降级为本地监听，面板内打字仍可检测
+- 菜单栏新增隐私提示：🔒 仅本地处理，不联网
+- 阈值滑块下限从 50ms 降至 30ms
+
+- Auto-fallback to local monitor during Secure Input; panel still works within Chatterkill's own windows
+- Menu bar privacy notice: 🔒 Local only, no network
+- Threshold slider minimum lowered from 50ms to 30ms
 
 ### v0.2.0
 
-- 108 键检测面板 + WKWebView 桥接 | 108-key tester panel with WKWebView bridge
-- 五态可视化（未测 / 正常 / 连击 / 迟钝 / 固件不上报）| Five-state visualization (untested / normal / chatter / slow / locked)
-- 点键改阈值，JSON 配置落盘 | Click-to-set threshold, JSON config persistence
-- 开机自启 / 中英自动适配 | Launch at login / auto bilingual (zh/en)
+- 108 键检测面板 + WKWebView 桥接
+- 五态可视化（未测 / 正常 / 连击 / 迟钝 / 固件不上报）
+- 点键改阈值，JSON 配置落盘
+- 开机自启 / 中英自动适配
+
+- 108-key tester panel with WKWebView bridge
+- Five-state visualization (untested / normal / chatter / slow / locked)
+- Click-to-set threshold, JSON config persistence
+- Launch at login / auto bilingual (zh/en)
 
 ## License
 
