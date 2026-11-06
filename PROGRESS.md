@@ -14,9 +14,11 @@
 
 ## v0.4.0 更新 / Changelog
 
-- 菜单栏第一段精简：去掉「拦截中·监听中」，改为「● 仅在本地不联网」；运行状态由图标承担 | Menu bar first row simplified: status line removed, replaced by "● Local only, no network"; the icon carries state
-- 新增勾选开关「拦截功能键」（默认关）与「拦截密码框」（默认开）| New toggles: "Block Modifier & Function Keys" (off by default) and "Block Password Fields" (on by default)
-- 阈值滑块下限从 30ms 降至 20ms | Threshold slider minimum lowered from 30ms to 20ms
+- 菜单勾选统一为小绿点：选中=点，未选=空槽，废除系统对勾 | Menu ticks are green dots now; on = dot, off = blank, no checkmarks
+- 第一段一行「仅在本地不联网」+ 常亮绿点；拦截状态绿点亮在「暂停拦截」行 | First row: "Local only, no network" with a steady dot; blocking state dot on the Pause row
+- 新增「拦截功能键」（默认关）与「拦截密码框」（默认开）| New toggles: Block Modifier & Function Keys (off), Block Password Fields (on)
+- 「打开检测面板」独立成段 + 键盘图标，英文 Open Tester | Open Tester gets its own section with a keyboard icon
+- 阈值滑块下限 20ms | Slider minimum 20ms
 
 ## v0.3.0 更新 / Changelog
 

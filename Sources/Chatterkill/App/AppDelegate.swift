@@ -214,10 +214,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         let menu = NSMenu()
 
-        // 第一段：常亮圆点 + 仅在本地不联网。运行状态由菜单栏图标承担，不再占一行文字。
-        let privacy = NSMenuItem(title: "", action: #selector(noop), keyEquivalent: "")
+        // 第一段：小绿点在勾选槽里常亮 = 持续工作状态；文字与其他行同一条左线。
+        let privacy = NSMenuItem(title: Loc.t("Local only, no network", "仅在本地不联网"),
+                                 action: #selector(noop), keyEquivalent: "")
         privacy.target = self
-        privacy.attributedTitle = privacyLineTitle()
+        privacy.image = Self.dotImage()
         menu.addItem(privacy)
 
         menu.addItem(.separator())
@@ -262,12 +263,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         passwordFieldsMenuItem = pwdFields
         menu.addItem(pwdFields)
 
+        menu.addItem(.separator())
+
+        // 检测面板自成一段：键盘图标让不懂中英文的人也认得出这个入口。
         let openPanel = NSMenuItem(
-            title: Loc.t("Open Tester…", "打开检测面板…"),
+            title: Loc.t("Open Tester", "打开检测面板"),
             action: #selector(openPanel),
             keyEquivalent: ""
         )
         openPanel.target = self
+        openPanel.image = Self.keyboardImage
         menu.addItem(openPanel)
 
         menu.addItem(.separator())
@@ -311,10 +316,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             ? Loc.t("Pause Blocking", "暂停拦截")
             : Loc.t("Start Blocking", "开始拦截")
 
-        functionKeysMenuItem?.state = blocker.blockFunctionKeys ? .on : .off
-        passwordFieldsMenuItem?.state = blocker.blockPasswordFields ? .on : .off
-
-        launchAtLoginMenuItem?.state = launchAtLoginEnabled ? .on : .off
+        // 勾选槽统一用绿点：选中=点，未选=空，不再出现系统对勾。
+        toggleMenuItem?.image = isEnabled ? Self.dotImage() : nil
+        functionKeysMenuItem?.image = blocker.blockFunctionKeys ? Self.dotImage() : nil
+        passwordFieldsMenuItem?.image = blocker.blockPasswordFields ? Self.dotImage() : nil
+        launchAtLoginMenuItem?.image = launchAtLoginEnabled ? Self.dotImage() : nil
 
         updateBlockMenuItems()
 
@@ -358,18 +364,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// 所以这两栏用「启用 + 空操作」实现纯展示，深色模式下也是白色。
     @objc private func noop() {}
 
-    /// 第一段隐私行：绿点常亮 = 持续工作状态；文字用 labelColor，深色模式不发灰。
-    private func privacyLineTitle() -> NSAttributedString {
-        let font = NSFont.menuFont(ofSize: 0)
-        let result = NSMutableAttributedString(
-            string: "● ",
-            attributes: [.foregroundColor: NSColor.systemGreen, .font: font]
-        )
-        result.append(NSAttributedString(
-            string: Loc.t("Local only, no network", "仅在本地不联网"),
-            attributes: [.foregroundColor: NSColor.labelColor, .font: font]
-        ))
-        return result
+    // MARK: - Menu slot icons
+
+    /// 键盘图标：与菜单栏图标同款；它的宽度就是勾选槽宽度，圆点按同宽画布居中。
+    private static let keyboardImage: NSImage? = {
+        guard let image = NSImage(systemSymbolName: "keyboard", accessibilityDescription: nil) else { return nil }
+        image.isTemplate = true
+        let ratio = image.size.width / max(1, image.size.height)
+        image.size = NSSize(width: (14 * ratio).rounded(), height: 14)
+        return image
+    }()
+
+    /// 小绿点：6px 圆，画在与键盘图标同宽的透明画布上，保证整列居中一致。
+    private static func dotImage() -> NSImage {
+        let width = keyboardImage?.size.width ?? 16
+        let image = NSImage(size: NSSize(width: width, height: 16))
+        image.lockFocus()
+        NSColor.systemGreen.setFill()
+        let d: CGFloat = 6
+        NSBezierPath(ovalIn: NSRect(x: ((width - d) / 2).rounded(), y: (16 - d) / 2, width: d, height: d)).fill()
+        image.unlockFocus()
+        return image
     }
 
     private func blockMenuTitle(_ title: String, value: Int) -> NSAttributedString {

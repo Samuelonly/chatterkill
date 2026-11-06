@@ -145,13 +145,21 @@ scripts/      build-app.sh, create-dmg.sh
 
 ### v0.4.0
 
-- 菜单栏第一段精简：去掉“拦截中·监听中”，改为“● 仅在本地不联网”；运行状态由图标承担（黄叹号=缺授权，变灰=已暂停）
-- 新增两个勾选开关：“拦截功能键”（默认关——连按 Fn 听写、Cmd 快捷键等修饰键/F1–F15 永不吞）、“拦截密码框”（默认开，延续 0.3.0；关掉后密码输入完全放行）
-- 阈值滑块下限从 30ms 降至 20ms
+- 菜单第一段就一行：“仅在本地不联网”，行首一颗小绿点
+- 菜单勾选全部改成小绿点：选中=有点，未选=空白，不再有对勾
+- 新增开关“拦截功能键”，默认关；不吞 ⌘⇧⌥⌃ / Fn / F1–F15，连按 Fn 听写安全
+- 新增开关“拦截密码框”，默认开；关掉后密码输入完全放行
+- 拦截中：“暂停拦截”那行亮绿点；暂停后熄灭
+- “打开检测面板”独立一段，行首键盘图标，不看文字也认得出
+- 阈值滑块下限降到 20ms
 
-- Menu bar first row simplified: the "Blocking · listening" line is gone, replaced by "● Local only, no network" (the icon now carries state: yellow badge = missing permission, dimmed = paused)
-- Two new toggles: "Block Modifier & Function Keys" (off by default — double-tap Fn dictation, Cmd shortcuts and other modifier / F1–F15 keys are never swallowed) and "Block Password Fields" (on by default, matching 0.3.0; turn it off to fully pass through password input)
-- Threshold slider minimum lowered from 30ms to 20ms
+- First menu row: "Local only, no network" with a small green dot
+- Menu ticks are green dots now: on = dot, off = blank; no more checkmarks
+- New toggle "Block Modifier & Function Keys", off by default — ⌘⇧⌥⌃ / Fn / F1–F15 are never swallowed
+- New toggle "Block Password Fields", on by default; turn it off and password input passes through
+- A green dot on the Pause/Start row means blocking is live
+- "Open Tester" gets its own section, led by a keyboard icon
+- Threshold slider minimum lowered to 20ms
 
 ### v0.3.0
 
