@@ -15,6 +15,21 @@ struct AppConfig: Codable, Equatable {
     struct Global: Codable, Equatable {
         var enabled: Bool = true
         var thresholdMs: Int = 100
+        /// 菜单「拦截功能键」，默认关（功能键不吞）。
+        var blockFunctionKeys: Bool = false
+        /// 菜单「拦截密码框」，默认开（延续 0.3.0 行为）。
+        var blockPasswordFields: Bool = true
+
+        init() {}
+
+        // 手写解码：0.3.0 及更早的配置没有这两个字段，缺省回落默认值。
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            enabled = (try container.decodeIfPresent(Bool.self, forKey: .enabled)) ?? true
+            thresholdMs = (try container.decodeIfPresent(Int.self, forKey: .thresholdMs)) ?? 100
+            blockFunctionKeys = (try container.decodeIfPresent(Bool.self, forKey: .blockFunctionKeys)) ?? false
+            blockPasswordFields = (try container.decodeIfPresent(Bool.self, forKey: .blockPasswordFields)) ?? true
+        }
     }
 
     struct UI: Codable, Equatable {
@@ -103,6 +118,8 @@ final class ConfigStore {
     func apply(to blocker: ChatterBlocker) {
         blocker.isEnabled = config.global.enabled
         blocker.globalThresholdMs = UInt64(max(0, config.global.thresholdMs))
+        blocker.blockFunctionKeys = config.global.blockFunctionKeys
+        blocker.blockPasswordFields = config.global.blockPasswordFields
         for (name, milliseconds) in config.perKey {
             guard let code = KeyMap.code(for: name) else { continue }
             blocker.setThreshold(UInt64(max(0, milliseconds)), for: code)
@@ -112,6 +129,8 @@ final class ConfigStore {
     func capture(from blocker: ChatterBlocker) {
         config.global.enabled = blocker.isEnabled
         config.global.thresholdMs = Int(blocker.globalThresholdMs)
+        config.global.blockFunctionKeys = blocker.blockFunctionKeys
+        config.global.blockPasswordFields = blocker.blockPasswordFields
         var perKey: [String: Int] = [:]
         for (code, milliseconds) in blocker.perKeyThresholdMs {
             perKey[KeyMap.name(for: code)] = Int(milliseconds)

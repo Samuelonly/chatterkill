@@ -143,6 +143,16 @@ scripts/      build-app.sh, create-dmg.sh
 
 ## 版本更新 / Changelog
 
+### v0.4.0
+
+- 菜单栏第一段精简：去掉“拦截中·监听中”，改为“● 仅在本地不联网”；运行状态由图标承担（黄叹号=缺授权，变灰=已暂停）
+- 新增两个勾选开关：“拦截功能键”（默认关——连按 Fn 听写、Cmd 快捷键等修饰键/F1–F15 永不吞）、“拦截密码框”（默认开，延续 0.3.0；关掉后密码输入完全放行）
+- 阈值滑块下限从 30ms 降至 20ms
+
+- Menu bar first row simplified: the "Blocking · listening" line is gone, replaced by "● Local only, no network" (the icon now carries state: yellow badge = missing permission, dimmed = paused)
+- Two new toggles: "Block Modifier & Function Keys" (off by default — double-tap Fn dictation, Cmd shortcuts and other modifier / F1–F15 keys are never swallowed) and "Block Password Fields" (on by default, matching 0.3.0; turn it off to fully pass through password input)
+- Threshold slider minimum lowered from 30ms to 20ms
+
 ### v0.3.0
 
 - 密码框 / Secure Input 下自动降级为本地监听，面板内打字仍可检测

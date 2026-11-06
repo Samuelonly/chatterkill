@@ -10,6 +10,7 @@
 
 import Foundation
 import CoreGraphics
+import Carbon.HIToolbox
 
 enum KeyVerdict: String {
     /// 绿灯：间隔 ≥ 阈值，正常
@@ -46,6 +47,20 @@ final class ChatterBlocker {
     var globalThresholdMs: UInt64 = 100
     /// 比这个还短的间隔直接忽略（脏硬件专用），0 = 关闭
     var minimumChatterMs: UInt64 = 0
+    /// 菜单「拦截功能键」：false 时修饰键 / Fn / F1–F15 任何情况下都不吞。
+    var blockFunctionKeys = false
+    /// 菜单「拦截密码框」：false 时系统停用 tap（Secure Input）后不再强行重开。
+    var blockPasswordFields = true
+
+    /// 54–63 = 左右 Shift / Command / Option / Control + Caps Lock + Fn。
+    static let functionKeyCodes: Set<CGKeyCode> = Set(
+        (54...63).map { CGKeyCode($0) } + [
+            CGKeyCode(kVK_F1), CGKeyCode(kVK_F2), CGKeyCode(kVK_F3), CGKeyCode(kVK_F4),
+            CGKeyCode(kVK_F5), CGKeyCode(kVK_F6), CGKeyCode(kVK_F7), CGKeyCode(kVK_F8),
+            CGKeyCode(kVK_F9), CGKeyCode(kVK_F10), CGKeyCode(kVK_F11), CGKeyCode(kVK_F12),
+            CGKeyCode(kVK_F13), CGKeyCode(kVK_F14), CGKeyCode(kVK_F15)
+        ]
+    )
 
     private(set) var perKeyThresholdMs: [CGKeyCode: UInt64] = [:]
 
@@ -89,6 +104,11 @@ final class ChatterBlocker {
     /// 返回 true = 放行，false = 吞掉这次按下。
     @discardableResult
     func handleKeyDown(keyCode: CGKeyCode) -> Bool {
+        // 未勾选「拦截功能键」时，功能键直接放行，不进任何计时状态。
+        if !blockFunctionKeys, Self.functionKeyCodes.contains(keyCode) {
+            return true
+        }
+
         // 按住重复（auto-repeat）不算新按键，原样放行，也不上报面板。
         if isDown[keyCode] == true {
             return true
@@ -130,6 +150,10 @@ final class ChatterBlocker {
     /// 返回 true = 放行，false = 吞掉这次抬起（按下被吞时必须一起吞）。
     @discardableResult
     func handleKeyUp(keyCode: CGKeyCode) -> Bool {
+        if !blockFunctionKeys, Self.functionKeyCodes.contains(keyCode) {
+            return true
+        }
+
         let timeNow = now()
         lastReleaseAt[keyCode] = timeNow
 

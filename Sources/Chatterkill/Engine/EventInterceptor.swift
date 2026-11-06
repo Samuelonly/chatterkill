@@ -5,9 +5,10 @@
 //  CGEventTap at session level, head-inserted so we see keys before other apps.
 //  Forked from Debounce/EventInterceptor.swift (MIT, Timo Leisengang).
 //
-//  Note: we intentionally do NOT tap .flagsChanged, so modifier keys
-//  (Command / Shift / Option / Control / Fn) can never be swallowed — that would
-//  break dictation, shortcuts and IME switching.
+//  Note: we intentionally do NOT tap .flagsChanged, so modifier key *state*
+//  never breaks. The modifier keys' own keyDown can still look like chatter —
+//  that is what the 0.4.0 "Block Modifier & Function Keys" toggle controls
+//  inside ChatterBlocker (off by default: Fn/Cmd double-taps are never swallowed).
 //
 
 import Cocoa
@@ -149,9 +150,17 @@ private func chatterkillTapCallback(
     refcon: UnsafeMutableRawPointer?
 ) -> Unmanaged<CGEvent>? {
     // 锁屏 / 超时会导致 tap 被系统停用：立刻重开，重不开才算死。
+    // 未勾选「拦截密码框」时不重开——系统停用 tap 基本就是进了 Secure Input（密码框），
+    // 尊重系统的停用等于放行密码输入；离开密码框后由菜单栏在下次激活时重挂。
     if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
         if let refcon {
             let driver = Unmanaged<CoreGraphicsEventTapDriver>.fromOpaque(refcon).takeUnretainedValue()
+            if !driver.chatterBlocker.blockPasswordFields {
+                DispatchQueue.main.async {
+                    driver.onTapDied?()
+                }
+                return Unmanaged.passUnretained(event)
+            }
             if let tap = driver.eventTap {
                 CGEvent.tapEnable(tap: tap, enable: true)
                 if !CGEvent.tapIsEnabled(tap: tap) {

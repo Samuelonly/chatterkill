@@ -23,8 +23,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     // MARK: - UI
 
     private var statusItem: NSStatusItem?
-    private var statusMenuItem: NSMenuItem?
     private var toggleMenuItem: NSMenuItem?
+    private var functionKeysMenuItem: NSMenuItem?
+    private var passwordFieldsMenuItem: NSMenuItem?
     private var todayMenuItem: NSMenuItem?
     private var totalMenuItem: NSMenuItem?
     private var launchAtLoginMenuItem: NSMenuItem?
@@ -213,15 +214,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         let menu = NSMenu()
 
-        let status = NSMenuItem(title: "", action: nil, keyEquivalent: "")
-        status.isEnabled = false
-        statusMenuItem = status
-        menu.addItem(status)
-
-        let privacy = NSMenuItem(title: Loc.t("🔒 Local only, no network", "🔒 仅本地处理，不联网"),
-                                 action: #selector(noop), keyEquivalent: "")
+        // 第一段：常亮圆点 + 仅在本地不联网。运行状态由菜单栏图标承担，不再占一行文字。
+        let privacy = NSMenuItem(title: "", action: #selector(noop), keyEquivalent: "")
         privacy.target = self
-        privacy.isEnabled = false
+        privacy.attributedTitle = privacyLineTitle()
         menu.addItem(privacy)
 
         menu.addItem(.separator())
@@ -247,6 +243,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         toggle.target = self
         toggleMenuItem = toggle
         menu.addItem(toggle)
+
+        let fnKeys = NSMenuItem(
+            title: Loc.t("Block Modifier & Function Keys", "拦截功能键"),
+            action: #selector(toggleFunctionKeys),
+            keyEquivalent: ""
+        )
+        fnKeys.target = self
+        functionKeysMenuItem = fnKeys
+        menu.addItem(fnKeys)
+
+        let pwdFields = NSMenuItem(
+            title: Loc.t("Block Password Fields", "拦截密码框"),
+            action: #selector(togglePasswordFields),
+            keyEquivalent: ""
+        )
+        pwdFields.target = self
+        passwordFieldsMenuItem = pwdFields
+        menu.addItem(pwdFields)
 
         let openPanel = NSMenuItem(
             title: Loc.t("Open Tester…", "打开检测面板…"),
@@ -293,26 +307,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func refreshMenu() {
         let trusted = permissionHelper.isAccessibilityTrusted(prompt: false)
 
-        let statusText: String
-        if !trusted {
-            statusText = Loc.t("Permission missing — not blocking", "缺授权 · 未拦截")
-        } else if isEnabled {
-            statusText = Loc.t("Blocking · listening", "拦截中 · 监听中")
-        } else {
-            statusText = Loc.t("Paused", "已暂停")
-        }
-
-        statusMenuItem?.attributedTitle = NSAttributedString(
-            string: statusText,
-            attributes: [
-                .foregroundColor: !trusted ? NSColor.systemYellow : (isEnabled ? NSColor.systemGreen : NSColor.secondaryLabelColor),
-                .font: NSFont.menuFont(ofSize: 0)
-            ]
-        )
-
         toggleMenuItem?.title = isEnabled
             ? Loc.t("Pause Blocking", "暂停拦截")
             : Loc.t("Start Blocking", "开始拦截")
+
+        functionKeysMenuItem?.state = blocker.blockFunctionKeys ? .on : .off
+        passwordFieldsMenuItem?.state = blocker.blockPasswordFields ? .on : .off
 
         launchAtLoginMenuItem?.state = launchAtLoginEnabled ? .on : .off
 
@@ -334,7 +334,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     // MARK: - Menu delegate
 
     func menuWillOpen(_ menu: NSMenu) {
+        resumeEngineIfIdle()
         updateBlockMenuItems()
+    }
+
+    /// 离开密码框后没有事件会唤醒我们；打开菜单时补一次重挂，仍是事件驱动（R2）。
+    private func resumeEngineIfIdle() {
+        guard isEnabled, !engineRunning,
+              permissionHelper.isAccessibilityTrusted(prompt: false) else { return }
+        startEngine(presentPermissionAlert: false)
     }
 
     private func updateBlockMenuItems() {
@@ -349,6 +357,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// 禁用态菜单项会被 AppKit 强制画灰，attributedTitle 的颜色也会被压暗；
     /// 所以这两栏用「启用 + 空操作」实现纯展示，深色模式下也是白色。
     @objc private func noop() {}
+
+    /// 第一段隐私行：绿点常亮 = 持续工作状态；文字用 labelColor，深色模式不发灰。
+    private func privacyLineTitle() -> NSAttributedString {
+        let font = NSFont.menuFont(ofSize: 0)
+        let result = NSMutableAttributedString(
+            string: "● ",
+            attributes: [.foregroundColor: NSColor.systemGreen, .font: font]
+        )
+        result.append(NSAttributedString(
+            string: Loc.t("Local only, no network", "仅在本地不联网"),
+            attributes: [.foregroundColor: NSColor.labelColor, .font: font]
+        ))
+        return result
+    }
 
     private func blockMenuTitle(_ title: String, value: Int) -> NSAttributedString {
         let label = NSFont.menuFont(ofSize: 0)
@@ -384,6 +406,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             blocker.resetTimingData()
             refreshMenu()
         }
+    }
+
+    @objc private func toggleFunctionKeys() {
+        blocker.blockFunctionKeys.toggle()
+        store.capture(from: blocker)
+        store.write()
+        refreshMenu()
+    }
+
+    @objc private func togglePasswordFields() {
+        blocker.blockPasswordFields.toggle()
+        store.capture(from: blocker)
+        store.write()
+        // 重新勾上「拦截密码框」且引擎因 Secure Input 停着 → 立刻尝试重挂。
+        if blocker.blockPasswordFields {
+            resumeEngineIfIdle()
+        }
+        refreshMenu()
     }
 
     @objc private func openPanel() {

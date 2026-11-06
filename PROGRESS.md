@@ -12,6 +12,12 @@
 | D | 开机自启 / 中英自动适配 / 图标 | ✅ 代码与图标已完成，**待重启验收** |
 | E | 验收 + DMG | 🟡 DMG 脚本就绪，压测与重启验收未做 |
 
+## v0.4.0 更新 / Changelog
+
+- 菜单栏第一段精简：去掉「拦截中·监听中」，改为「● 仅在本地不联网」；运行状态由图标承担 | Menu bar first row simplified: status line removed, replaced by "● Local only, no network"; the icon carries state
+- 新增勾选开关「拦截功能键」（默认关）与「拦截密码框」（默认开）| New toggles: "Block Modifier & Function Keys" (off by default) and "Block Password Fields" (on by default)
+- 阈值滑块下限从 30ms 降至 20ms | Threshold slider minimum lowered from 30ms to 20ms
+
 ## v0.3.0 更新 / Changelog
 
 - 密码框 / Secure Input 下自动降级为本地监听，面板内打字仍可检测 | Auto-fallback to local monitor during Secure Input; panel still works within Chatterkill's own windows
@@ -24,7 +30,8 @@
   所以 `Debounce.xcodeproj` 不能 `xcodebuild`，改走 SwiftPM + 手工组装 `.app`。
 - 上游 Debounce **没有开机自启**，`SMAppService` 这一段是本项目自己加的。
 - α 版**只需要 Accessibility 一个权限**；Input Monitoring 是 1.0「补发」才需要。
-- `CGEventTap` 只监听 `keyDown/keyUp`，不监听 `flagsChanged`，所以 Command/Shift/Option 永远吞不到。
+- `CGEventTap` 只监听 `keyDown/keyUp`，不监听 `flagsChanged`；但修饰键自身的 keyDown 仍可能被当连击吞掉，
+  0.4.0 起「拦截功能键」未勾选时 54–63（含 Fn/CapsLock）+ F1–F15 直接放行。
 - 面板关闭走 `PanelController.close()`：停加载 → 摘 message handler → 视图摘除 → 置 nil → 窗口释放。
   少一步 R1 就不达标。
 
