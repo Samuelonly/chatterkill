@@ -226,11 +226,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         // 拦截统计两栏：今日 / 累计。打开菜单时刷新，不做定时器。
         let today = NSMenuItem(title: "", action: #selector(noop), keyEquivalent: "")
         today.target = self
+        today.image = Self.emptySlotImage
         todayMenuItem = today
         menu.addItem(today)
 
         let total = NSMenuItem(title: "", action: #selector(noop), keyEquivalent: "")
         total.target = self
+        total.image = Self.emptySlotImage
         totalMenuItem = total
         menu.addItem(total)
 
@@ -292,6 +294,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             keyEquivalent: ""
         )
         repair.target = self
+        repair.image = Self.emptySlotImage
         menu.addItem(repair)
 
         menu.addItem(.separator())
@@ -302,6 +305,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             keyEquivalent: ""
         )
         quit.target = self
+        quit.image = Self.emptySlotImage
         menu.addItem(quit)
 
         item.menu = menu
@@ -316,11 +320,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             ? Loc.t("Pause Blocking", "暂停拦截")
             : Loc.t("Start Blocking", "开始拦截")
 
-        // 勾选槽统一用绿点：选中=点，未选=空，不再出现系统对勾。
-        toggleMenuItem?.image = isEnabled ? Self.dotImage() : nil
-        functionKeysMenuItem?.image = blocker.blockFunctionKeys ? Self.dotImage() : nil
-        passwordFieldsMenuItem?.image = blocker.blockPasswordFields ? Self.dotImage() : nil
-        launchAtLoginMenuItem?.image = launchAtLoginEnabled ? Self.dotImage() : nil
+        // 勾选槽统一用绿点：选中=点，未选=空槽（透明图标），不再出现系统对勾。
+        toggleMenuItem?.image = isEnabled ? Self.dotImage() : Self.emptySlotImage
+        functionKeysMenuItem?.image = blocker.blockFunctionKeys ? Self.dotImage() : Self.emptySlotImage
+        passwordFieldsMenuItem?.image = blocker.blockPasswordFields ? Self.dotImage() : Self.emptySlotImage
+        launchAtLoginMenuItem?.image = launchAtLoginEnabled ? Self.dotImage() : Self.emptySlotImage
 
         updateBlockMenuItems()
 
@@ -366,18 +370,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     // MARK: - Menu slot icons
 
-    /// 键盘图标：与菜单栏图标同款；它的宽度就是勾选槽宽度，圆点按同宽画布居中。
-    private static let keyboardImage: NSImage? = {
-        guard let image = NSImage(systemSymbolName: "keyboard", accessibilityDescription: nil) else { return nil }
+    /// 键盘图标：不复用 SF Symbol（写实键帽在 14pt 下糊成一团），手绘抽象版——
+    /// 圆角矩形外框 + 一条空格键横杠，模板图随深浅色/高亮自动反色。
+    private static let slotWidth: CGFloat = 18
+
+    private static let keyboardImage: NSImage = {
+        let image = NSImage(size: NSSize(width: slotWidth, height: 16))
+        image.lockFocus()
+        NSColor.black.setStroke()
+        NSColor.black.setFill()
+        let frame = NSBezierPath(
+            roundedRect: NSRect(x: 2.2, y: 3.3, width: 13.6, height: 9.4),
+            xRadius: 2.1, yRadius: 2.1
+        )
+        frame.lineWidth = 1.1
+        frame.stroke()
+        NSBezierPath(
+            roundedRect: NSRect(x: 5.6, y: 4.9, width: 6.8, height: 1.5),
+            xRadius: 0.75, yRadius: 0.75
+        ).fill()
+        image.unlockFocus()
         image.isTemplate = true
-        let ratio = image.size.width / max(1, image.size.height)
-        image.size = NSSize(width: (14 * ratio).rounded(), height: 14)
         return image
     }()
 
-    /// 小绿点：6px 圆，画在与键盘图标同宽的透明画布上，保证整列居中一致。
+    /// 小绿点：6px 圆，画在槽画布上居中。
     private static func dotImage() -> NSImage {
-        let width = keyboardImage?.size.width ?? 16
+        let width = slotWidth
         let image = NSImage(size: NSSize(width: width, height: 16))
         image.lockFocus()
         NSColor.systemGreen.setFill()
@@ -386,6 +405,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         image.unlockFocus()
         return image
     }
+
+    /// 空槽：全透明但占同样大小，未选中 / 纯文字行也进槽，保证全菜单一条左边缘。
+    private static let emptySlotImage: NSImage = {
+        let image = NSImage(size: NSSize(width: slotWidth, height: 16))
+        image.lockFocus()
+        image.unlockFocus()
+        return image
+    }()
 
     private func blockMenuTitle(_ title: String, value: Int) -> NSAttributedString {
         let label = NSFont.menuFont(ofSize: 0)
