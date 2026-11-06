@@ -42,7 +42,7 @@ My mechanical keyboard is a few years old and some keys started misbehaving: a f
 
 ## 几个刻意的设计 / Deliberate choices
 
-- **功能键永远不拦。** `Command` / `Shift` / `Option` / `Control` / `Fn` 走的是 `flagsChanged`，引擎压根不监听这条通道，所以任何快捷键都不会被吞掉、不会被改。这是故意的，不是漏掉了。
+- **功能键默认不拦。** 修饰键 / Fn / F1–F15 是否参与拦截，由菜单里的「拦截功能键」决定，默认不勾——连按 Fn 呼出听写、双击 Cmd 这类快捷操作永远不会被吞。想全拦就勾上。
 
 - **检测面板就是设置。** 关掉面板时 WebView 连同它的辅助进程一起销毁，只剩拦截引擎常驻，不占 CPU、不占内存。检测完就关掉，是设计，不是妥协。
 
@@ -50,7 +50,7 @@ My mechanical keyboard is a few years old and some keys started misbehaving: a f
 
 - **开机即监听。** 开机自启默认开启，重启后不用点任何东西，拦截就在跑。
 
-- **Function keys are never intercepted.** `Command` / `Shift` / `Option` / `Control` / `Fn` travel on `flagsChanged`, which the engine doesn't subscribe to at all — so no shortcut is ever swallowed or rewritten. Intentional.
+- **Function keys are off-limits by default.** Whether modifier / Fn / F1–F15 keys participate in blocking is the menu toggle "Block Modifier & Function Keys" — left unchecked, double-tap Fn dictation and Cmd shortcuts can never be swallowed. Tick it to block everything.
 
 - **The tester** ***is*** **the settings window.** Closing it tears down the WebView and its helper process; only the event engine stays resident. One-shot calibration, zero idle cost.
 
@@ -66,7 +66,7 @@ My mechanical keyboard is a few years old and some keys started misbehaving: a f
 
 - **只需要一个权限：辅助功能（Accessibility）。** 不需要输入监控、不需要完全磁盘访问。| Only **Accessibility**. No Input Monitoring, no Full Disk Access.
 
-- 常驻内存约 20–30 MB，空闲 CPU 基本是 0.0%。| \~20–30 MB resident, idle CPU ≈ 0.0%.
+- 常驻内存约 30–50 MB，空闲 CPU 基本是 0.0%。| \~30–50 MB resident, idle CPU ≈ 0.0%.
 
 - 关掉键盘连击检测面板后，面板进程退出、内存回落，主程序的监听引擎继续常驻。| Closing the chatter tester tears down the panel process and drops the memory; the blocking engine keeps running.
 
@@ -97,7 +97,7 @@ There's no Dock icon; it lives in the menu bar only. Double-clicking the app ico
 1. 菜单栏图标 → **打开检测面板…** | menu-bar icon → **Open Tester…**
 2. 打一段字，或者把怀疑的键各按几下。| Type a paragraph, or tap each suspect key a few times.
 3. 红键 = 连击，蓝键 = 迟钝，绿键 = 正常。| Red = chattering, blue = mushy, green = fine.
-4. 点任意键帽 → 选 30–300 ms 的阈值；**Use global** 取消这个键的单独设置。| Click any key cap → pick a 30–300 ms threshold; **Use global** removes the per-key override.
+4. 点任意键帽 → 选 20–300 ms 的阈值；**Use global** 取消这个键的单独设置。| Click any key cap → pick a 20–300 ms threshold; **Use global** removes the per-key override.
 5. 点 **DONE** 或关窗：面板销毁，只留引擎。| Click **DONE** or close the window: panel destroyed, engine stays.
 6. 菜单栏里还能看到**今日拦截 / 累计拦截**两栏统计（今日每天零点自动清零）。| The menu also shows **blocked today / blocked total** (today resets at midnight).
 
@@ -135,7 +135,7 @@ scripts/      build-app.sh, create-dmg.sh
 
 ## 已知限制 / Known limits
 
-- 密码框、`sudo`、Touch ID 这类安全输入，macOS 会主动禁用事件监听。此时 Chatterkill 自动切换到本地监听模式，面板内打字仍可检测，但无法拦截其他应用的密码输入——这是系统级安全限制。| macOS disables event taps around secure input (password fields, `sudo`, Touch ID). Chatterkill automatically falls back to local monitoring: the panel still works for typing within its own windows, but cannot intercept password input in other apps — this is a system-level security restriction.
+- 密码框、`sudo`、Touch ID 这类安全输入，macOS 会主动停用事件监听。勾选「拦截密码框」（默认开）时 Chatterkill 会重新挂上监听，密码框里的按键照常被拦截；取消勾选则尊重系统的停用——密码输入完全放行，离开密码框后自动恢复全局监听。| Under Secure Input (password fields, `sudo`, Touch ID) macOS suspends the event tap. With "Block Password Fields" on (default) Chatterkill re-attaches and keeps blocking; turn it off to respect the suspension — password input passes through untouched, and global monitoring resumes automatically once you leave the field.
 
 - α 版本只做“吞掉多余按键”，不会帮迟钝的键补发字符。| The alpha only swallows extra presses; it won't re-send characters for mushy keys.
 
