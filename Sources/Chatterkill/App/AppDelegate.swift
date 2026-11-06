@@ -320,8 +320,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             ? Loc.t("Pause Blocking", "暂停拦截")
             : Loc.t("Start Blocking", "开始拦截")
 
-        // 勾选槽统一用绿点：选中=点，未选=空槽（透明图标），不再出现系统对勾。
-        toggleMenuItem?.image = isEnabled ? Self.dotImage() : Self.emptySlotImage
+        // toggle 行：选中=绿点，暂停=灰点（不是空槽，一眼区分运行/停止）。
+        // 其他三行（功能键/密码框/开机自启）仍用绿点/空槽，切换频率低。
+        toggleMenuItem?.image = isEnabled ? Self.dotImage() : Self.greyDotImage()
         functionKeysMenuItem?.image = blocker.blockFunctionKeys ? Self.dotImage() : Self.emptySlotImage
         passwordFieldsMenuItem?.image = blocker.blockPasswordFields ? Self.dotImage() : Self.emptySlotImage
         launchAtLoginMenuItem?.image = launchAtLoginEnabled ? Self.dotImage() : Self.emptySlotImage
@@ -400,6 +401,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let image = NSImage(size: NSSize(width: width, height: 16))
         image.lockFocus()
         NSColor.systemGreen.setFill()
+        let d: CGFloat = 6
+        NSBezierPath(ovalIn: NSRect(x: ((width - d) / 2).rounded(), y: (16 - d) / 2, width: d, height: d)).fill()
+        image.unlockFocus()
+        return image
+    }
+
+    /// 小灰点：和绿点同尺寸同位置，暂停时用。
+    private static func greyDotImage() -> NSImage {
+        let width = slotWidth
+        let image = NSImage(size: NSSize(width: width, height: 16))
+        image.lockFocus()
+        NSColor.systemGray.setFill()
         let d: CGFloat = 6
         NSBezierPath(ovalIn: NSRect(x: ((width - d) / 2).rounded(), y: (16 - d) / 2, width: d, height: d)).fill()
         image.unlockFocus()
