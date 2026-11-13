@@ -31,6 +31,13 @@
 | 权限修复提醒 / permission-fix pill | `#ffd60a` |
 | 背景 / background | `#1c1c1e`，面板 `#242426`，键帽 `#2c2c2e` → `#3a3a3c` |
 
+## Geek 备注 / Geek note
+
+- 这个红，是可口可乐红；这个绿，是雪碧绿。
+- The red is Coca-Cola red; the green is Sprite green.
+- 如果你曾经把可乐洒在键盘上——非常遗憾，这就是我做这个软件的原因。
+- If you have ever spilled Coke on your keyboard — my condolences. That is exactly why this software exists.
+
 ## 历史 / History
 
 - v0.5.0 之前面板混用 teal 青 `#00d5d5` 与系统红 `#ff453a`，v0.5.0 起废弃，统一为上述两把基准尺。
