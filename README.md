@@ -16,6 +16,10 @@ Chatterkill is a tiny macOS menu-bar utility that stops **keyboard double typing
 
 ## 为什么做这个 / Why
 
+> 这个红，是可口可乐红；这个绿，是雪碧绿。如果你曾经把可乐洒在键盘上——非常遗憾，这就是我做这个软件的原因。
+>
+> The red is Coca-Cola red; the green is Sprite green. If you have ever spilled Coke on your keyboard — my condolences. That is exactly why this software exists.
+
 我这把机械键盘用了几年，有几个键开始不听话：有的必须用力按到底才出字，有的轻轻一碰就变成连击。我试过在 GitHub 上找到的 [Eviduunce/Debounce](https://github.com/Eviduunce/Debounce) 来加延迟，确实有效，但它没法直观看出来“哪个键连击得最快”，我只能盲猜着一个个试。
 
 所以我在它的启发下重写了这个软件：保留那套好用的拦截引擎思路，补上一块可以自己点亮键帽的检测面板，把“发现问题”和“解决问题”放进同一个窗口——点一下出问题的键，直接给它改延迟。
