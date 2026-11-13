@@ -143,6 +143,11 @@ scripts/      build-app.sh, create-dmg.sh
 
 ## 版本更新 / Changelog
 
+### v0.5.0
+
+- 全新家族化图标：酒瓶开关红底 squircle，App 内 icns 与 README 同步换新
+- Brand-new unified icon: swing-top bottle on a red squircle — same icon now in the app bundle (icns) and the README
+
 ### v0.4.0
 
 - 菜单第一段就一行：“仅在本地不联网”，行首一颗小绿点
