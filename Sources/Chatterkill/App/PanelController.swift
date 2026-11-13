@@ -46,14 +46,14 @@ final class PanelController: NSObject, NSWindowDelegate, WKScriptMessageHandler,
         configuration.preferences.javaScriptCanOpenWindowsAutomatically = false
         configuration.websiteDataStore = .nonPersistent()
 
-        let web = WKWebView(frame: NSRect(x: 0, y: 0, width: 1040, height: 620), configuration: configuration)
+        let web = WKWebView(frame: NSRect(x: 0, y: 0, width: 1040, height: 420), configuration: configuration)
         web.autoresizingMask = [.width, .height]
         web.allowsBackForwardNavigationGestures = false
         web.navigationDelegate = self
         web.underPageBackgroundColor = NSColor(calibratedRed: 0.11, green: 0.11, blue: 0.12, alpha: 1)
 
         let panel = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 1040, height: 620),
+            contentRect: NSRect(x: 0, y: 0, width: 1040, height: 420),
             styleMask: [.titled, .closable, .miniaturizable, .resizable],
             backing: .buffered,
             defer: false
@@ -63,7 +63,7 @@ final class PanelController: NSObject, NSWindowDelegate, WKScriptMessageHandler,
         panel.isReleasedWhenClosed = false
         panel.contentView = web
         panel.delegate = self
-        panel.minSize = NSSize(width: 900, height: 560)
+        panel.minSize = NSSize(width: 900, height: 390)
         panel.center()
 
         webView = web

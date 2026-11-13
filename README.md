@@ -119,9 +119,11 @@ The event engine and menu-bar shell are forked from [Eviduunce/Debounce](https:/
 - 全新家族化图标：酒瓶开关红底 squircle，App 内 icns 与 README 同步换新
 - 面板视觉统一：红以图标红（#ca0600）为基准，绿以键位描边绿为基准——KILL 标识、完成按钮、图例方块、监听中绿点、最近按键时间、阈值滑块全部对齐，色彩规范见 docs/COLORS.md
 - README 按 0.5.0 全面重写：功能补齐（两个保险开关）、文案精简、效果图与配色同步
+- 面板修复与排版：清掉布局数据笔误产生的幽灵「a」键；两个 Del 改为 ⌫ / ⌦ 消除歧义；窗口高度贴合内容、间距统一 10px，不再有大片留白；未测键描边换淡暖绿
 - Brand-new unified icon: swing-top bottle on a red squircle — same icon now in the app bundle (icns) and the README
 - Panel visuals unified: red follows the icon red (#ca0600), green follows the key-outline green — KILL wordmark, Done button, legend swatches, listening dot, last-key time and threshold slider all match; see docs/COLORS.md
 - README rewritten for 0.5.0: feature-complete (both safety toggles), tighter copy, screenshot in the new palette
+- Panel fixes & layout: removed the phantom "a" key caused by a layout-data typo; the two Del keys are now ⌫ / ⌦; window height hugs the content with a uniform 10px rhythm — no more dead space; untested keys get a faint warm-green hairline
 
 ### v0.4.0
 

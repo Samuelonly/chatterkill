@@ -28,7 +28,7 @@
     color: var(--txt);
     font: 13px/1.4 -apple-system, "SF Pro Text", "Helvetica Neue", "PingFang SC", sans-serif;
     display: flex; flex-direction: column;
-    padding: 14px 16px 10px;
+    padding: 10px 16px 10px;
     gap: 10px;
     overflow: hidden;
   }
@@ -50,7 +50,7 @@
   .pill.fix:hover{ border-color:#ffd60a; }
 
   /* ---------- stage ---------- */
-  .stage{ display:flex; gap:12px; flex:1 1 auto; min-height:0; align-items:flex-start; }
+  .stage{ display:flex; gap:12px; flex:1 1 auto; min-height:0; align-items:center; }
   .board{ display:flex; gap:10px; padding:10px; background:var(--panel); border-radius:10px; border:1px solid #303032; }
   .col{ display:flex; flex-direction:column; gap:var(--gap); }
   .row{ display:flex; gap:var(--gap); height:var(--h); }
@@ -73,7 +73,7 @@
   .key.locked{ opacity:.32; cursor:not-allowed; }
 
   /* five states */
-  .key[data-state="untested"]{ box-shadow: inset 0 0 0 1px rgba(100,210,255,.22); }
+  .key[data-state="untested"]{ box-shadow: inset 0 0 0 1px rgba(236,252,202,.18); }
   .key[data-state="normal"]{ border-color: rgba(48,209,88,.65); box-shadow: 0 0 0 1px rgba(48,209,88,.28), inset 0 0 8px rgba(48,209,88,.12); }
   .key[data-state="chatter"]{ border-color: var(--red); box-shadow: 0 0 0 1px var(--red), 0 0 12px rgba(202,6,0,.55), inset 0 0 10px rgba(202,6,0,.22); }
   .key[data-state="slow"]{ border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue), 0 0 10px rgba(10,132,255,.4); }
