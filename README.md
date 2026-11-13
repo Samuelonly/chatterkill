@@ -146,7 +146,9 @@ scripts/      build-app.sh, create-dmg.sh
 ### v0.5.0
 
 - 全新家族化图标：酒瓶开关红底 squircle，App 内 icns 与 README 同步换新
+- 面板视觉统一：红以图标红（#ca0600）为基准，绿以键位描边绿为基准——KILL 标识、完成按钮、图例方块、监听中绿点全部对齐
 - Brand-new unified icon: swing-top bottle on a red squircle — same icon now in the app bundle (icns) and the README
+- Panel visuals unified: red now follows the icon red (#ca0600), green follows the key-outline green — KILL wordmark, Done button, legend swatches and the listening dot all match
 
 ### v0.4.0
 
