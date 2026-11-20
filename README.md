@@ -114,6 +114,13 @@ The event engine and menu-bar shell are forked from [Eviduunce/Debounce](https:/
 
 ## 版本更新 / Changelog
 
+### v0.6.0
+
+- 修复 Finder 列表视图里图标发黄、发糊的问题：重制 AppIcon.icns，补齐 16×16 等全部尺寸，任意视图都显示正确的红底可乐瓶
+- 菜单栏图标换成键帽 K（keycap-K），固定 24pt，暂停/未授权时用透明度区分状态
+- Fixed the yellow, blurry icon in Finder list view: rebuilt AppIcon.icns with every size including 16×16, so the red swing-top bottle shows correctly in any view
+- Menu bar icon replaced with the keycap-K glyph at a fixed 24pt; paused/unauthorized states are shown via opacity
+
 ### v0.5.0
 
 - 全新家族化图标：酒瓶开关红底 squircle，App 内 icns 与 README 同步换新

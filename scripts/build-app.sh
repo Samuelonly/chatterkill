@@ -10,9 +10,9 @@ CONFIG="${1:-release}"
 APP="$ROOT/dist/Chatterkill.app"
 
 echo "==> swift build (-c $CONFIG)"
-swift build -c "$CONFIG" --product Chatterkill
+swift build --disable-sandbox -c "$CONFIG" --product Chatterkill
 
-BIN="$(swift build -c "$CONFIG" --show-bin-path)/Chatterkill"
+BIN="$(swift build --disable-sandbox -c "$CONFIG" --show-bin-path)/Chatterkill"
 
 echo "==> assemble $APP"
 rm -rf "$APP"
@@ -29,9 +29,13 @@ if [ -d "$ROOT/Resources/web" ]; then
   cp -R "$ROOT/Resources/web" "$APP/Contents/Resources/web"
 fi
 
+if [ -f "$ROOT/Resources/MenuBarIcon.png" ]; then
+  cp "$ROOT/Resources/MenuBarIcon.png" "$APP/Contents/Resources/MenuBarIcon.png"
+fi
+
 if [ -f "$ROOT/Resources/AppIcon.icns" ]; then
   cp "$ROOT/Resources/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
-  /usr/libexec/PlistBuddy -c "Add :CFBundleIconFile string AppIcon" "$APP/Contents/Info.plist" 2>/dev/null || true
+  /usr/libexec/PlistBuddy -c "Set :CFBundleIconFile AppIcon" "$APP/Contents/Info.plist" 2>/dev/null || true
 fi
 
 echo "==> sign"

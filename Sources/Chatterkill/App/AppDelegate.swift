@@ -205,11 +205,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusItem = item
 
         if let button = item.button {
-            button.image = NSImage(
-                systemSymbolName: "keyboard",
-                accessibilityDescription: "Chatterkill"
-            )
-            button.image?.isTemplate = true
+            button.image = Self.menuBarImage
         }
 
         let menu = NSMenu()
@@ -330,15 +326,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         updateBlockMenuItems()
 
         if let button = statusItem?.button {
-            button.image = NSImage(
-                systemSymbolName: trusted ? "keyboard" : "keyboard.badge.exclamationmark",
-                accessibilityDescription: "Chatterkill"
-            )
-            button.image?.isTemplate = true
-            button.contentTintColor = !trusted
-                ? .systemYellow
-                : (isEnabled ? nil : .secondaryLabelColor)
-            button.appearsDisabled = trusted && !isEnabled
+            button.image = Self.menuBarImage
+            // 用图标透明度表达运行状态：正常=实色，暂停=半透明，未授权=禁用态。
+            // 彩色图标不适合 contentTintColor（会把整张图染黄），故改用 alpha。
+            button.alphaValue = trusted ? (isEnabled ? 1.0 : 0.5) : 0.6
+            button.appearsDisabled = !trusted
         }
     }
 
@@ -368,6 +360,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// 禁用态菜单项会被 AppKit 强制画灰，attributedTitle 的颜色也会被压暗；
     /// 所以这两栏用「启用 + 空操作」实现纯展示，深色模式下也是白色。
     @objc private func noop() {}
+
+    // MARK: - Menu bar icon
+
+    /// 菜单栏常驻图标：keycap-K（红色键帽家族的黑白线性版），固定 24pt。
+    /// 资源是 48×48 的 @2x 图，isTemplate=false 保留原始配色。
+    private static let menuBarImage: NSImage = {
+        guard let url = Bundle.main.url(forResource: "MenuBarIcon", withExtension: "png"),
+              let image = NSImage(contentsOf: url) else {
+            // 兜底：资源缺失时仍给一个可见图标，绝不让菜单栏空着。
+            let fallback = NSImage(systemSymbolName: "keyboard",
+                                   accessibilityDescription: "Chatterkill")!
+            fallback.isTemplate = true
+            return fallback
+        }
+        image.size = NSSize(width: 24, height: 24)
+        image.isTemplate = false
+        return image
+    }()
 
     // MARK: - Menu slot icons
 
